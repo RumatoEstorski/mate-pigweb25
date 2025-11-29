@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pig-Bioethik Validator</title>
+    <title>MATE-PIGWEB25 Evaluator</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -16,195 +17,167 @@
             <img src="logo.png" alt="Logo" class="title-icon">
             MATE-PIGWEB25
         </h1>
-        <p>The Researcher and Society</p>
+        <p>Advanced EU Ethics Validator (Directive 2010/63/EU)</p>
     </div>
 
     <section class="app-card">
-        <header>
-            <h2>1. Ethical Decision Simulator</h2>
-            <p class="subtitle">Input project parameters to see if they meet the strict necessity criteria.</p>
-        </header>
-
-        <form id="ethicsForm">
-            <div class="form-group">
-                <label for="goal">Research Objective</label>
-                <select id="goal">
-                    <option value="10"> Critical Medical/Vet Research (e.g., Disease Cure)</option>
-                    <option value="9"> Species Preservation (Conservation)</option>
-                    <option value="8"> Safety/Toxicology Testing (Industrial)</option>
-                    <option value="6"> Biological Knowledge / Growth</option>
-                    <option value="4"> Education & Training (University)</option>
-                    <option value="1"> Cosmetic / Non-Essential Testing</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="alternatives">Alternative Methods (3Rs)</label>
-                <select id="alternatives">
-                    <option value="no">No non-animal alternatives exist</option>
-                    <option value="yes">Yes, computer models/in-vitro available</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="suffering">Predicted Animal Severity</label>
-                <select id="suffering">
-                    <option value="2">🟢 Mild (Observation, minor injection)</option>
-                    <option value="5">🟡 Moderate (Surgery with anesthesia)</option>
-                    <option value="9">🔴 Severe (Significant distress)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="species">Animal Species</label>
-                <select id="species">
-                    <option value="Pigs">Pigs</option>
-                    <option value="Poultry">Poultry (Chickens/Turkeys)</option>
-                    <option value="Dairy Cows">Dairy Cows</option>
-                    <option value="Beef Cattle">Beef Cattle</option>
-                    <option value="Guinea Pigs">Guinea Pigs</option>
-                    <option value="Rats">Rats</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="numbers">Number of Animals (Reduction Principle)</label>
-                <select id="numbers">
-                    <option value="0.8">0 - 24 (Low Impact)</option>
-                    <option value="1.0">25 - 100 (Medium Impact)</option>
-                    <option value="1.2">101 - 500 (High Impact)</option>
-                    <option value="1.5">> 500 (Very High Impact)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="success_rate">Scientific Probability</label>
-                <select id="success_rate">
-                    <option value="1.0">High Confidence (Proven Methodology)</option>
-                    <option value="0.7">Medium Confidence (Experimental)</option>
-                    <option value="0.3">Low Confidence (Speculative)</option>
-                </select>
-            </div>
-
-            <button type="button" class="btn-analyze" onclick="calculateVerdict()">Evaluate Necessity</button>
-        </form>
-
-        <div id="result">
-            <span class="status-icon" id="statusIcon"></span>
-            <div class="verdict-title" id="verdictTitle"></div>
-            <div class="verdict-text" id="verdictText"></div>
+        <h2>Load Scenario Preset</h2>
+        <div class="scenario-buttons">
+            <button class="chip" onclick="loadPreset('xeno')"> Xenotransplantation</button>
+            <button class="chip" onclick="loadPreset('amr')"> Antimicrobial Resistance</button>
+            <button class="chip" onclick="loadPreset('pain')"> Pain Research</button>
+            <button class="chip" onclick="loadPreset('neuro')"> Neuroscience (Primate)</button>
+            <button class="chip" onclick="loadPreset('cosmetics')"> Cosmetics</button>
         </div>
     </section>
 
     <section class="app-card">
-        <header>
-            <h2>2. The EU Authorisation Process</h2>
-            <p class="subtitle">Click the steps below to explore how the EU Directive 2010/63/EU is enforced.</p>
-        </header>
-
-        <div class="timeline">
-            <div class="step" onclick="showDetails(1)">
-                <div class="circle">1</div>
-                <div class="label">Proposal</div>
-            </div>
-            <div class="line"></div>
-            
-            <div class="step" onclick="showDetails(2)">
-                <div class="circle">2</div>
-                <div class="label">Ethics</div>
-            </div>
-            <div class="line"></div>
-
-            <div class="step" onclick="showDetails(3)">
-                <div class="circle">3</div>
-                <div class="label">Authority</div>
-            </div>
-            <div class="line"></div>
-
-            <div class="step" onclick="showDetails(4)">
-                <div class="circle">4</div>
-                <div class="label">Approval</div>
-            </div>
+        <h2>1. Project Parameters</h2>
+        
+        <div class="form-group">
+            <label>Project Title</label>
+            <input type="text" id="projectTitle" placeholder="e.g. Study of Porcine Insulin">
         </div>
 
-        <div id="process-details" class="info-box">
-            <h3>👋 Explore the Process</h3>
-            <p>Select a stage in the timeline above to see the specific legal checks required.</p>
+        <div class="form-group">
+            <label>Research Goal</label>
+            <select id="goal" onchange="toggleCosmetics()">
+                <option value="10"> Life-threatening Disease / Public Health</option>
+                <option value="7"> Regulatory Safety Testing</option>
+                <option value="5"> Translational Research</option>
+                <option value="3"> Basic Research</option>
+                <option value="1"> Cosmetic / Non-Essential</option>
+            </select>
         </div>
+
+        <div id="cosmeticsBox" class="cosmetics-note">
+            <strong>⚠️ REACH Regulation Check (1907/2006)</strong><br>
+            Is this testing explicitly required for worker safety?
+            <select id="reachJustified" style="margin-top:5px;">
+                <option value="no">No → Strictly Banned</option>
+                <option value="yes">Yes → Conditional Approval Possible</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Animal Species</label>
+            <select id="species">
+                <option value="pig">Pig (Porcine)</option>
+                <option value="rodent">Rodent (Rat/Mouse)</option>
+                <option value="primate">Non-Human Primate</option>
+                <option value="dog">Dog</option>
+                <option value="fish">Fish</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Number of Animals</label>
+            <select id="numbers">
+                <option value="0.8">&lt; 50 (Excellent Reduction)</option>
+                <option value="1.0">50 – 500 (Standard)</option>
+                <option value="1.3">501 – 2000 (High)</option>
+                <option value="1.5">&gt; 2000 (Very High)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Severity Classification</label>
+            <select id="severityClass">
+                <option value="mild">🟢 Mild</option>
+                <option value="moderate">🟡 Moderate</option>
+                <option value="severe">🔴 Severe</option>
+                <option value="non">⚫ Non-Recovery</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Cumulative Severity (History)</label>
+            <select id="cumulativeSeverity">
+                <option value="none">None (Naive Animals)</option>
+                <option value="mild">Mild Previous Use</option>
+                <option value="moderate">Moderate Previous Use</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Non-Animal Alternatives (Replacement)</label>
+            <select id="alternatives">
+                <option value="no">No validated alternative exists</option>
+                <option value="partial">Partial replacement used</option>
+                <option value="yes">Full replacement exists (Must use)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Specific Harm Score (1-10)</label>
+            <input type="number" id="suffering" min="1" max="10" value="5">
+        </div>
+        
+        <div class="form-group">
+            <label>Necessity Score (1-5)</label>
+            <input type="number" id="necessity" min="1" max="5" value="3">
+        </div>
+
     </section>
 
     <section class="app-card">
-        <header>
-            <h2>3. Cost-Benefit Balance Sheet</h2>
-            <p class="subtitle">Adjust variables or load Pig-Bioethik scenarios to see how benefits are weighed against costs.</p>
-        </header>
-
-        <div class="scenario-group-label">Production & Environment</div>
-        <div class="scenario-buttons">
-            <button class="chip" onclick="loadScenario('growth')"> Growth Performance</button>
-            <button class="chip" onclick="loadScenario('fat')"> Fat Quality</button>
-            <button class="chip" onclick="loadScenario('enviro')"> Environmental Impact</button>
-        </div>
-
-        <div class="scenario-group-label">Health & Welfare</div>
-        <div class="scenario-buttons">
-            <button class="chip" onclick="loadScenario('drug')"> Drug Response</button>
-            <button class="chip" onclick="loadScenario('amr')"> Antimicrobial Resist.</button>
-            <button class="chip" onclick="loadScenario('pain')"> Pain & Stress</button>
-            <button class="chip" onclick="loadScenario('behaviour')"> Behaviour</button>
-            <button class="chip" onclick="loadScenario('housing')"> Housing Systems</button>
-        </div>
-
-        <div class="scenario-group-label">Biomedical Frontiers</div>
-        <div class="scenario-buttons">
-            <button class="chip" onclick="loadScenario('organ')"> Organ Transplant</button>
-        </div>
-
+        <h2>2. Assessment Metrics</h2>
+        
         <div class="slider-container">
-            <label>
-                <span>Scientific Potential</span>
-                <span id="val-science">50%</span>
-            </label>
-            <input type="range" id="scienceSlider" min="0" max="100" value="50" oninput="updateBalance()">
-        </div>
-
-        <div class="slider-container">
-            <label>
-                <span>Animal Harm (Severity & Number)</span>
-                <span id="val-harm">50%</span>
-            </label>
-            <input type="range" id="harmSlider" min="0" max="100" value="50" oninput="updateBalance()">
-        </div>
-
-        <div class="slider-container">
-            <label>
-                <span>Financial Cost</span>
-                <span id="val-money">50%</span>
-            </label>
-            <input type="range" id="moneySlider" min="0" max="100" value="50" oninput="updateBalance()">
-        </div>
-
-        <div class="chart-area">
-            <div class="bar-group">
-                <div class="bar-label">Total Benefit</div>
-                <div class="bar-track">
-                    <div id="bar-benefit" class="bar-fill benefit" style="width: 50%;"></div>
-                </div>
+            <div class="slider-Label-row">
+                <span>Success Likelihood</span>
+                <span id="successVal" class="slider-val">50%</span>
             </div>
-
-            <div class="bar-group">
-                <div class="bar-label">Total Cost (Ethical + Financial)</div>
-                <div class="bar-track">
-                    <div id="bar-cost" class="bar-fill cost" style="width: 50%;"></div>
-                </div>
-            </div>
-            
-            <div id="balance-result" class="balance-text">⚖️ The scales are balanced.</div>
+            <input type="range" id="success_rate" min="0" max="100" value="50">
         </div>
+
+        <div class="slider-container">
+            <div class="slider-Label-row">
+                <span>3Rs Compliance</span>
+                <span id="threersVal" class="slider-val">60%</span>
+            </div>
+            <input type="range" id="threers" min="0" max="100" value="60">
+        </div>
+
+        <div class="slider-container">
+            <div class="slider-Label-row">
+                <span>Scientific Uncertainty</span>
+                <span id="uncertaintyVal" class="slider-val">30%</span>
+            </div>
+            <input type="range" id="uncertainty" min="0" max="100" value="30">
+        </div>
+
+        <div class="form-group">
+            <label style="display:flex; align-items:center; gap:10px;">
+                <input type="checkbox" id="humaneEndpoints" style="width:auto;" required>
+                Humane endpoints are clearly defined
+            </label>
+        </div>
+
+        <button class="btn-analyze" onclick="calculateVerdict()">Evaluate Proposal</button>
+        
+        <div id="result" class="result-box"></div>
     </section>
 
-    <footer class="footer-note">
-        <p>Educational Tool. Based on EU Directive 2010/63/EU guidelines for animal protection in science.</p>
+    <section class="app-card">
+        <h2>3. Documentation</h2>
+        <button class="btn-analyze btn-secondary" onclick="generateNTS()">Generate Non-Technical Summary</button>
+        <button class="btn-analyze btn-secondary" onclick="exportPDF()">Export Verdict as PDF</button>
+        
+        <div id="ntsOutput"></div>
+    </section>
+
+    <section class="app-card" style="border: 2px solid #bae6fd; background:#f0f9ff;">
+        <h3>🧬 NCBI Gene Lookup (Live API)</h3>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="geneSearch" placeholder="e.g. INS, BRCA1, TNF">
+            <button onclick="fetchGene()" style="width:auto; padding:0 20px; border-radius:10px; border:none; background:var(--primary); color:white; cursor:pointer;">Search</button>
+        </div>
+        <div id="ncbiResult">Waiting for input...</div>
+    </section>
+
+    <footer style="text-align:center; font-size:12px; color:#9ca3af; margin-top:20px;">
+        <p>Based on Directive 2010/63/EU, Regulation 1223/2009, and REACH 1907/2006.</p>
     </footer>
 
 </main>
